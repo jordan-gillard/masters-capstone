@@ -1,0 +1,116 @@
+﻿@model Capstone.Models.SurveyModel
+@{
+    ViewBag.Title = "Survey";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<p class="text-success">@ViewBag.StatusMessage</p>
+<div class="row">
+    <div class="col-md-8">
+        <section id="loginForm">
+            @using (Html.BeginForm("SurveyResults", "Survey", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                <h4>Use a local account to log in.</h4>
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="form-group">
+                    @Html.LabelFor(m => m.AppointmentDate, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-8">
+                        @Html.DropDownListFor(m => m.AppointmentDate, new SelectList(Model.AppointmentDates), new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.AppointmentDate, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.Label("How long did you wait to see the physician?");
+                @Html.ValidationMessageFor(m => m.PhysicanWait, "", new { @class = "text-danger" })
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-12">
+                            @Html.RadioButtonFor(m => m.PhysicanWait, "Right Away", new { @class = "form-control" }) @Html.Label("Right Away")
+                            @Html.RadioButtonFor(m => m.PhysicanWait, "15-30 Minutes", new { @class = "form-control" }) @Html.Label("15-30 Minutes")
+                            @Html.RadioButtonFor(m => m.PhysicanWait, "30-45 Minutes", new { @class = "form-control" }) @Html.Label("30-45 Minutes")
+                            @Html.RadioButtonFor(m => m.PhysicanWait, "45-60+ Minutes", new { @class = "form-control" }) @Html.Label("45-60+ Minutes")
+                        </div>
+                    </div>
+                </div>
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.Label("How long did you spend with the physician?");
+                @Html.ValidationMessageFor(m => m.PhysicanTime, "", new { @class = "text-danger" })
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-12">
+                            @Html.RadioButtonFor(m => m.PhysicanTime, "Right Away", new { @class = "form-control" }) @Html.Label("0-15 Minutes")
+                            @Html.RadioButtonFor(m => m.PhysicanTime, "15-30 Minutes", new { @class = "form-control" }) @Html.Label("15-30 Minutes")
+                            @Html.RadioButtonFor(m => m.PhysicanTime, "30-45 Minutes", new { @class = "form-control" }) @Html.Label("30-45 Minutes")
+                            @Html.RadioButtonFor(m => m.PhysicanTime, "45-60+ Minutes", new { @class = "form-control" }) @Html.Label("45-60+ Minutes")
+                        </div>
+                    </div>
+                </div>
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.Label("Were all of your topics discussed?");
+                @Html.ValidationMessageFor(m => m.TopicsDiscussed, "", new { @class = "text-danger" })
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-12">
+                            @Html.RadioButtonFor(m => m.TopicsDiscussed, "Yes", new { @class = "form-control" }) @Html.Label("0-15 Minutes")
+                            @Html.RadioButtonFor(m => m.TopicsDiscussed, "No", new { @class = "form-control" }) @Html.Label("15-30 Minutes")
+                        </div>
+                    </div>
+                </div>
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.Label("Do you have a follow-up visit scheduled?");
+                @Html.ValidationMessageFor(m => m.FollowupScheduled, "", new { @class = "text-danger" })
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-12">
+                            @Html.RadioButtonFor(m => m.FollowupScheduled, "Yes", new { @class = "form-control" }) @Html.Label("0-15 Minutes")
+                            @Html.RadioButtonFor(m => m.FollowupScheduled, "No", new { @class = "form-control" }) @Html.Label("15-30 Minutes")
+                        </div>
+                    </div>
+                </div>
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.Label("Would you recommend Capstone Medical to friends and family?");
+                @Html.ValidationMessageFor(m => m.Recommend, "", new { @class = "text-danger" })
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-12">
+                            @Html.RadioButtonFor(m => m.Recommend, "Yes", new { @class = "form-control" }) @Html.Label("0-15 Minutes")
+                            @Html.RadioButtonFor(m => m.Recommend, "No", new { @class = "form-control" }) @Html.Label("15-30 Minutes")
+                        </div>
+                    </div>
+                </div>
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.Label("How would you rate your visit?");
+                @Html.ValidationMessageFor(m => m.Rating, "", new { @class = "text-danger" })
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-12">
+                            @Html.RadioButtonFor(m => m.Rating, "1", new { @class = "form-control" }) @Html.Label("1")
+                            @Html.RadioButtonFor(m => m.Rating, "2", new { @class = "form-control" }) @Html.Label("2")
+                            @Html.RadioButtonFor(m => m.Rating, "3", new { @class = "form-control" }) @Html.Label("3")
+                            @Html.RadioButtonFor(m => m.Rating, "4", new { @class = "form-control" }) @Html.Label("4")
+                            @Html.RadioButtonFor(m => m.Rating, "5", new { @class = "form-control" }) @Html.Label("5")
+                        </div>
+                    </div>
+                </div>
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.Label("Additional Comments");
+                @Html.ValidationMessageFor(m => m.Rating, "", new { @class = "text-danger" })
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-12">
+                            @Html.TextBoxFor(m => m.Comments, new { @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Submit" class="btn btn-default" />
+                    </div>
+                </div>
+            }
+        </section>
+    </div>
+</div>
