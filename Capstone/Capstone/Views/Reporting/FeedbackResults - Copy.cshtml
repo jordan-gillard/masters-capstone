@@ -1,0 +1,67 @@
+﻿@using Newtonsoft.Json
+
+@{
+    ViewBag.Title = "Capstone Medical - Hospitals";
+
+}
+
+<html>
+<head>
+    <title>Survey Results</title>
+
+    <link rel="stylesheet" href="~/Content/tabulator.min.css">
+    <script type="text/javascript" src="~/Scripts/jquery-ui.js"></script>
+    <script type="text/javascript" src="~/Scripts/tabulator.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery_wrapper.min.js"></script>
+    <script type="text/javascript">
+        function HospitalID_Change() {
+		    ReloadTabulator();
+	    };
+        $(document).ready(function () {
+
+            var DateFormatter = function (cell, formatterParams) { //plain text value
+				if ((cell.getValue() == null) || (cell.getValue() == "/Date(-62135575200000)/"))
+					return "";
+                var x = Date(parseInt(cell.getValue().replace('/Date(', '')));
+                return new Date(parseInt(cell.getValue().replace('/Date(', ''))).toLocaleDateString();
+            };
+
+            $("#ValuesTable").tabulator({
+                ajaxURL: "../Reporting/GetFeedbackList", //ajax URL
+                ajaxParams:{HospitalID:$("#Hospital").val()},
+                ajaxConfig: "POST", //ajax HTTP request type
+                layout: "fitColumns",
+                tooltips: true,
+                addRowPos: "top",
+                history: true,
+                pagination: "local",
+                paginationSize: 25,
+                movableColumns: true,
+                resizableRows: true,
+                initialSort: [
+                    { column: "CreatedOn", dir: "desc" },
+                ],
+                columns: [
+                    { title: "CreatedOn", field: "CreatedOn", editable : false, headerFilter:true, formatter: DateFormatter },
+                    { title: "Question", field: "Question", editable : false, headerFilter:true },
+                    { title: "Response", field: "Response", editable : false, headerFilter:true}
+                ]
+            });
+
+        });
+
+    </script>
+
+</head>
+<body>
+    <br />
+    <h3>Hospital: </h3>
+    <div> @Html.DropDownList("HospitalList", new SelectList(Capstone.Controllers.MaintenanceController.GetHospitalList(), "ID", "name"), new { id = "Hospital", onChange = "HospitalID_Change()" }) <br /><br /></div>
+
+    <h3>Results: </h3>
+
+    <br />
+    <div id="ValuesTable"></div>
+
+</body>
+</html>

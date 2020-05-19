@@ -423,6 +423,13 @@ namespace Capstone.Controllers
             base.Dispose(disposing);
         }
 
+        public static bool IsAuthenticated()
+        {
+            return System.Web.HttpContext.Current.User != null &&
+                    System.Web.HttpContext.Current.User.Identity != null &&
+                    System.Web.HttpContext.Current.User.Identity.IsAuthenticated;
+        }
+
         #region Helpers
         // Used for XSRF protection when adding external logins
         private const string XsrfKey = "XsrfId";

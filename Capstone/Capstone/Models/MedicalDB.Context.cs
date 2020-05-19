@@ -25,6 +25,14 @@ namespace Capstone.Models
             throw new UnintentionalCodeFirstException();
         }
     
+        public virtual DbSet<AuditEntry> AuditEntries { get; set; }
+        public virtual DbSet<AuditEntryProperty> AuditEntryProperties { get; set; }
+        public virtual DbSet<hospital> hospitals { get; set; }
+        public virtual DbSet<option> options { get; set; }
+        public virtual DbSet<respons> responses { get; set; }
+        public virtual DbSet<user> users { get; set; }
+        public virtual DbSet<AspNetUser> AspNetUsers { get; set; }
+        public virtual DbSet<question> questions { get; set; }
         public virtual DbSet<SurveyResult> SurveyResults { get; set; }
     }
 }

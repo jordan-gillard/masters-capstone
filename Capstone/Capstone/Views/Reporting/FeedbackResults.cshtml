@@ -1,0 +1,129 @@
+﻿@using Newtonsoft.Json
+@using System.Data;
+@model System.Data.DataTable
+
+@{
+    ViewBag.Title = "Capstone Medical - Feedback Results";
+
+}
+
+<html>
+<head>
+    <title>Survey Results</title>
+
+    <link rel="stylesheet" href="~/Content/tabulator.min.css">
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.12/css/jquery.dataTables.css">
+    <script type="text/javascript" src="~/Scripts/jquery-ui.js"></script>
+    <script type="text/javascript">
+        function HospitalID_Change() {
+            window.location = "FeedBackResults?HospitalID=" + $("#Hospital").val();;
+        };
+        $(document).ready(function () {
+            if (@Model.Rows.Count > 0) {
+                $('#table_id').DataTable({
+                    "scrollY": "600px",
+                    "scrollX": true,
+                    autoWidth: false,
+                    "info": true,
+                    initComplete: function () {
+                        this.api().columns().every(function () {
+                            var column = this;
+                            var columnheader = column.header();
+                            if (column.header().innerText != "CreatedOn") {
+                                var select = $('<select id ="Select' + column.header().innerText + '"><option value=""></option></select>')
+                                    .appendTo($(column.header()))
+                                    .on('change', function () {
+                                        //that.search($(this).val()).draw();
+                                        var val = $.fn.dataTable.util.escapeRegex(
+                                            $(this).val()
+                                        );
+
+                                        column
+                                            .search(val ? '^' + val + '$' : '', true, false)
+                                            .draw();
+                                    });
+                                var state = this.state.loaded();
+                                var truncatedseachvalue = "";
+                                if (state) {
+                                    truncatedseachvalue = state.columns[this.index()].search.search;
+                                    if (truncatedseachvalue.charAt(0) == '^')
+                                        truncatedseachvalue = truncatedseachvalue.substring(1);
+                                    if (truncatedseachvalue.substring(truncatedseachvalue.length - 1) == '$')
+                                        truncatedseachvalue = truncatedseachvalue.substring(0, truncatedseachvalue.length - 1);
+                                }
+
+                                column.data().unique().sort().each(function (d, j) {
+                                    if ($.fn.dataTable.util.escapeRegex(d) == truncatedseachvalue) {
+                                        select.append('<option value="' + d + '" selected="selected">' + d + '</option>')
+                                    }
+                                    else {
+                                        select.append('<option value="' + d + '">' + d + '</option>')
+                                    }
+                                });
+                                // Restore state saved values
+
+                            }
+                        });
+                    }
+                });
+            }
+        });
+        
+    </script>
+
+    @{
+        DataTable table = Model;
+        Layout = "~/Views/Shared/_Layout.cshtml";
+        if (table.Rows.Count > 0)
+        {
+            Model.DefaultView.Sort = "CreatedOn ASC";
+        }
+        int RowCount = 0;
+
+    }
+
+</head>
+<body>
+    <h3>View feedback for hospital: </h3>
+    <div> @Html.DropDownList("HospitalList", new SelectList(Capstone.Controllers.MaintenanceController.GetHospitalList(), "ID", "name"),"Please Select...", new { id = "Hospital", onChange = "HospitalID_Change()" }) <br /><br /></div>
+    <br />
+    @{
+        if (table.Rows.Count > 0)
+        {
+        <h3>Hospital: @ViewBag.HospitalName</h3>
+            if (table.Rows.Count > 500)
+            {
+                @Html.Label("", "Only displaying the first 500 of " + table.Rows.Count.ToString() + " rows.  You will need to click Download Report to retrieve all the results", new { style = "color:#ff0000" });
+            }
+            <table id="table_id" class="display compact cell-border" width="1500px">
+                <thead>
+                    <tr>
+                        @foreach (DataColumn column in table.Columns)
+                        {
+                            <th>@column.ColumnName.Replace("_", " ")</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (DataRowView row in table.DefaultView)
+                    {
+                        <tr>
+                            @foreach (DataColumn column in table.Columns)
+                            {
+
+                                <th>@row[column.ColumnName].ToString()</th>
+                            }
+                        </tr>
+                        RowCount++;
+                        if (RowCount > 499)
+                        {
+                            break;
+                        }
+                    }
+                </tbody>
+            </table>
+            <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.js"></script>
+        }
+    }
+</body>
+</html>

@@ -4,9 +4,25 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="1b0b2b8b2d7f44db84435c691e1d7f48" Name="Diagram1" >
-        <EntityTypeShape EntityType="MedicalModel.SurveyResult" Width="1.5" PointX="0.75" PointY="0.75" />
-      </Diagram>
+      <Diagram DiagramId="1b0b2b8b2d7f44db84435c691e1d7f48" Name="Diagram1" ZoomLevel="69" >
+        <EntityTypeShape EntityType="MedicalModel.AuditEntry" Width="1.5" PointX="3.375" PointY="1" />
+        <EntityTypeShape EntityType="MedicalModel.AuditEntryProperty" Width="1.5" PointX="5.625" PointY="1" />
+        <AssociationConnector Association="MedicalModel.FK_dbo_AuditEntryProperties_dbo_AuditEntries_AuditEntryID" />
+        <EntityTypeShape EntityType="MedicalModel.hospital" Width="1.5" PointX="0.875" PointY="4.25" />
+        <EntityTypeShape EntityType="MedicalModel.option" Width="1.5" PointX="7.625" PointY="6.375" />
+        <EntityTypeShape EntityType="MedicalModel.respons" Width="1.5" PointX="9.875" PointY="5.375" />
+        <EntityTypeShape EntityType="MedicalModel.user" Width="1.5" PointX="3.125" PointY="8" />
+        <AssociationConnector Association="MedicalModel.FK__responses__hospi__3CF40B7E" />
+        <AssociationConnector Association="MedicalModel.FK__users__hospital___336AA144" />
+        <AssociationConnector Association="MedicalModel.FK__responses__optio__3DE82FB7" />
+        <EntityTypeShape EntityType="MedicalModel.AspNetUser" Width="1.5" PointX="5.875" PointY="9.75" />
+        <EntityTypeShape EntityType="MedicalModel.question" Width="1.5" PointX="8.125" PointY="0.75" />
+        <AssociationConnector Association="MedicalModel.FK__questions__user___4B422AD5" />
+        <AssociationConnector Association="MedicalModel.FK__questions__hospi__36470DEF" />
+        <AssociationConnector Association="MedicalModel.FK__options__questio__477199F1" />
+        <AssociationConnector Association="MedicalModel.FK__responses__quest__4865BE2A" />
+        <EntityTypeShape EntityType="MedicalModel.SurveyResult" Width="1.5" PointX="0.75" PointY="7.75" />
+        </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
 </edmx:Edmx>

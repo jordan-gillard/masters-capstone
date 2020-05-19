@@ -1,0 +1,117 @@
+﻿@model Capstone.Models.question
+@using Newtonsoft.Json
+
+@{
+    ViewBag.Title = "Capstone Medical - Hospitals";
+
+}
+
+<html>
+<head>
+    <title>Hospital Question Options Maintenance</title>
+
+    <link rel="stylesheet" href="~/Content/tabulator.min.css">
+    <script type="text/javascript" src="~/Scripts/jquery-ui.js"></script>
+    <script type="text/javascript" src="~/Scripts/tabulator.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery_wrapper.min.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            var DateFormatter = function (cell, formatterParams) { //plain text value
+				if ((cell.getValue() == null) || (cell.getValue() == "/Date(-62135575200000)/"))
+					return "";
+                var x = Date(parseInt(cell.getValue().replace('/Date(', '')));
+                return new Date(parseInt(cell.getValue().replace('/Date(', ''))).toLocaleDateString();
+            };
+
+            $("#ValuesTable").tabulator({
+                ajaxURL: "../Maintenance/GetHospitalQuestionOptionsList", //ajax URL
+                ajaxParams:{QuestionID:"@Model.id"},
+                ajaxConfig: "POST", //ajax HTTP request type
+                layout: "fitColumns",
+                tooltips: true,
+                addRowPos: "top",
+                history: true,
+                pagination: "local",
+                paginationSize: 25,
+                movableColumns: true,
+                resizableRows: true,
+                initialSort: [
+                    { column: "text", dir: "asc" },
+                ],
+                columns: [
+                    { title: "id", field: "id", visible: false },
+                    { title: "Text", field: "text", editor: "input", editable: true },
+                    { title: "Active", field: "active", align: "center", editor: true, formatter: "tickCross" },
+                    { title: "Created_On", field: "created_on", editor: "input", editable: false, align: "center", formatter: DateFormatter}
+                ]
+            });
+
+        });
+
+        function AddValueRow() {
+            $("#ValuesTable").tabulator("addRow", {});
+        }
+
+        function SaveValues(TabulatorDivID) {
+            ShowSpinnerSaving();
+            var ArrayObjectRawJSONed = CreateJSONArrayObjectFromTabulator(TabulatorDivID);
+            $.ajax({
+
+                url: "../Maintenance/UpdateHospitalQuestionOptions_List",
+                data: { QuestionID:"@Model.id", lines: ArrayObjectRawJSONed },
+                type: 'Post',
+                dataType: 'json',
+                success: function (results) {
+                    HideSpinner();
+                    $("#ValuesTable").tabulator("setData");
+                },
+
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    HideSpinner();
+                    alert("Status: " + textStatus); alert("Error: " + errorThrown)
+                }
+            });
+        }
+        function CreateJSONArrayObjectFromTabulator(TabulatorDivID) {
+
+            var arrayobject = new Array();
+            var arrayobjectRaw = new Array();
+
+            if (TabulatorDivID === undefined)
+                return arrayobject
+            var TabulatorData = $(TabulatorDivID).tabulator("getData");
+            TabulatorData.forEach(function (row) {
+                if (row != undefined) { arrayobjectRaw.push(row); }
+            });
+            return JSON.stringify(arrayobjectRaw);
+        };
+
+    </script>
+
+</head>
+<body>
+
+    <h3>Hospital: @Capstone.Controllers.MaintenanceController.GetHospitalName(Model.hospital_id)</h3>
+    <h3>Question: @Model.text</h3>
+    <h3>Options:</h3>
+    <br />
+    <input id="AddValue" type="submit" value="Add Row" class="Branded" onclick="AddValueRow()" style="margin-right:20px;" />
+    <input id="AddValue" class="Branded" type="submit" value="Save Values" onclick="SaveValues('#ValuesTable')" />
+    <br />
+    <br />
+    <div id="ValuesTable"></div>
+
+
+
+
+    <div id="saving">
+        <div id="savingcontent">
+            <p id="savingspinner">
+                Saving...
+            </p>
+        </div>
+    </div>
+</body>
+</html>

@@ -5,6 +5,90 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="MedicalModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="AspNetUsers">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="Email" Type="nvarchar" MaxLength="256" />
+          <Property Name="EmailConfirmed" Type="bit" Nullable="false" />
+          <Property Name="PasswordHash" Type="nvarchar(max)" />
+          <Property Name="SecurityStamp" Type="nvarchar(max)" />
+          <Property Name="PhoneNumber" Type="nvarchar(max)" />
+          <Property Name="PhoneNumberConfirmed" Type="bit" Nullable="false" />
+          <Property Name="TwoFactorEnabled" Type="bit" Nullable="false" />
+          <Property Name="LockoutEndDateUtc" Type="datetime" />
+          <Property Name="LockoutEnabled" Type="bit" Nullable="false" />
+          <Property Name="AccessFailedCount" Type="int" Nullable="false" />
+          <Property Name="UserName" Type="nvarchar" MaxLength="256" Nullable="false" />
+        </EntityType>
+        <EntityType Name="AuditEntries">
+          <Key>
+            <PropertyRef Name="AuditEntryID" />
+          </Key>
+          <Property Name="AuditEntryID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="EntitySetName" Type="nvarchar" MaxLength="255" />
+          <Property Name="EntityTypeName" Type="nvarchar" MaxLength="255" />
+          <Property Name="State" Type="int" Nullable="false" />
+          <Property Name="StateName" Type="nvarchar" MaxLength="255" />
+          <Property Name="CreatedBy" Type="nvarchar" MaxLength="255" />
+          <Property Name="CreatedDate" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="AuditEntryProperties">
+          <Key>
+            <PropertyRef Name="AuditEntryPropertyID" />
+          </Key>
+          <Property Name="AuditEntryPropertyID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AuditEntryID" Type="int" Nullable="false" />
+          <Property Name="RelationName" Type="nvarchar" MaxLength="255" />
+          <Property Name="PropertyName" Type="nvarchar" MaxLength="255" />
+          <Property Name="OldValue" Type="nvarchar(max)" />
+          <Property Name="NewValue" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="hospitals">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="name" Type="varchar" MaxLength="150" Nullable="false" />
+          <Property Name="active" Type="bit" Nullable="false" />
+          <Property Name="created_on" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="options">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="question_id" Type="int" Nullable="false" />
+          <Property Name="text" Type="varchar" MaxLength="60" Nullable="false" />
+          <Property Name="active" Type="bit" Nullable="false" />
+          <Property Name="created_on" Type="datetime" Nullable="false" />
+          <Property Name="deactivated_on" Type="datetime" />
+        </EntityType>
+        <EntityType Name="questions">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="hospital_id" Type="int" Nullable="false" />
+          <Property Name="user_id" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="text" Type="varchar(max)" Nullable="false" />
+          <Property Name="active" Type="bit" Nullable="false" />
+          <Property Name="free_text_field" Type="bit" Nullable="false" />
+          <Property Name="multiple_choice" Type="bit" Nullable="false" />
+          <Property Name="created_on" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="responses">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="question_id" Type="int" Nullable="false" />
+          <Property Name="hospital_id" Type="int" Nullable="false" />
+          <Property Name="option_id" Type="int" />
+          <Property Name="response_text" Type="varchar(max)" />
+          <Property Name="created" Type="datetime" />
+        </EntityType>
         <EntityType Name="SurveyResults">
           <Key>
             <PropertyRef Name="ID" />
@@ -21,16 +105,420 @@
           <Property Name="Comments" Type="varchar(max)" />
           <Property Name="CREATE_DATE" Type="datetime" Nullable="false" />
         </EntityType>
+        <EntityType Name="users">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="username" Type="varchar" MaxLength="128" Nullable="false" />
+          <Property Name="email" Type="varchar" MaxLength="128" Nullable="false" />
+          <Property Name="name" Type="varchar" MaxLength="150" Nullable="false" />
+          <Property Name="password_hash" Type="varchar" MaxLength="128" />
+          <Property Name="active" Type="bit" Nullable="false" />
+          <Property Name="created_on" Type="datetime" Nullable="false" />
+          <Property Name="hospital_id" Type="int" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'Medical.dbo.SurveySummary' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <Association Name="FK__options__questio__477199F1">
+          <End Role="questions" Type="Self.questions" Multiplicity="1" />
+          <End Role="options" Type="Self.options" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="questions">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="options">
+              <PropertyRef Name="question_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__questions__hospi__36470DEF">
+          <End Role="hospitals" Type="Self.hospitals" Multiplicity="1" />
+          <End Role="questions" Type="Self.questions" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="hospitals">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="questions">
+              <PropertyRef Name="hospital_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__questions__user___4B422AD5">
+          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1" />
+          <End Role="questions" Type="Self.questions" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUsers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="questions">
+              <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__responses__hospi__3CF40B7E">
+          <End Role="hospitals" Type="Self.hospitals" Multiplicity="1" />
+          <End Role="responses" Type="Self.responses" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="hospitals">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="responses">
+              <PropertyRef Name="hospital_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__responses__optio__3DE82FB7">
+          <End Role="options" Type="Self.options" Multiplicity="0..1" />
+          <End Role="responses" Type="Self.responses" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="options">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="responses">
+              <PropertyRef Name="option_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__responses__quest__4865BE2A">
+          <End Role="questions" Type="Self.questions" Multiplicity="1" />
+          <End Role="responses" Type="Self.responses" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="questions">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="responses">
+              <PropertyRef Name="question_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__users__hospital___336AA144">
+          <End Role="hospitals" Type="Self.hospitals" Multiplicity="1" />
+          <End Role="users" Type="Self.users" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="hospitals">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="users">
+              <PropertyRef Name="hospital_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_AuditEntryProperties_dbo_AuditEntries_AuditEntryID">
+          <End Role="AuditEntries" Type="Self.AuditEntries" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="AuditEntryProperties" Type="Self.AuditEntryProperties" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AuditEntries">
+              <PropertyRef Name="AuditEntryID" />
+            </Principal>
+            <Dependent Role="AuditEntryProperties">
+              <PropertyRef Name="AuditEntryID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityContainer Name="MedicalModelStoreContainer">
+          <EntitySet Name="AspNetUsers" EntityType="Self.AspNetUsers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="AuditEntries" EntityType="Self.AuditEntries" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="AuditEntryProperties" EntityType="Self.AuditEntryProperties" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="hospitals" EntityType="Self.hospitals" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="options" EntityType="Self.options" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="questions" EntityType="Self.questions" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="responses" EntityType="Self.responses" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SurveyResults" EntityType="Self.SurveyResults" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="users" EntityType="Self.users" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK__options__questio__477199F1" Association="Self.FK__options__questio__477199F1">
+            <End Role="questions" EntitySet="questions" />
+            <End Role="options" EntitySet="options" />
+          </AssociationSet>
+          <AssociationSet Name="FK__questions__hospi__36470DEF" Association="Self.FK__questions__hospi__36470DEF">
+            <End Role="hospitals" EntitySet="hospitals" />
+            <End Role="questions" EntitySet="questions" />
+          </AssociationSet>
+          <AssociationSet Name="FK__questions__user___4B422AD5" Association="Self.FK__questions__user___4B422AD5">
+            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
+            <End Role="questions" EntitySet="questions" />
+          </AssociationSet>
+          <AssociationSet Name="FK__responses__hospi__3CF40B7E" Association="Self.FK__responses__hospi__3CF40B7E">
+            <End Role="hospitals" EntitySet="hospitals" />
+            <End Role="responses" EntitySet="responses" />
+          </AssociationSet>
+          <AssociationSet Name="FK__responses__optio__3DE82FB7" Association="Self.FK__responses__optio__3DE82FB7">
+            <End Role="options" EntitySet="options" />
+            <End Role="responses" EntitySet="responses" />
+          </AssociationSet>
+          <AssociationSet Name="FK__responses__quest__4865BE2A" Association="Self.FK__responses__quest__4865BE2A">
+            <End Role="questions" EntitySet="questions" />
+            <End Role="responses" EntitySet="responses" />
+          </AssociationSet>
+          <AssociationSet Name="FK__users__hospital___336AA144" Association="Self.FK__users__hospital___336AA144">
+            <End Role="hospitals" EntitySet="hospitals" />
+            <End Role="users" EntitySet="users" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_AuditEntryProperties_dbo_AuditEntries_AuditEntryID" Association="Self.FK_dbo_AuditEntryProperties_dbo_AuditEntries_AuditEntryID">
+            <End Role="AuditEntries" EntitySet="AuditEntries" />
+            <End Role="AuditEntryProperties" EntitySet="AuditEntryProperties" />
+          </AssociationSet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="MedicalModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityContainer Name="MedicalEntities" annotation:LazyLoadingEnabled="true" >
+          <EntitySet Name="AuditEntries" EntityType="MedicalModel.AuditEntry" />
+          <EntitySet Name="AuditEntryProperties" EntityType="MedicalModel.AuditEntryProperty" />
+          <AssociationSet Name="FK_dbo_AuditEntryProperties_dbo_AuditEntries_AuditEntryID" Association="MedicalModel.FK_dbo_AuditEntryProperties_dbo_AuditEntries_AuditEntryID">
+            <End Role="AuditEntry" EntitySet="AuditEntries" />
+            <End Role="AuditEntryProperty" EntitySet="AuditEntryProperties" />
+          </AssociationSet>
+          <EntitySet Name="hospitals" EntityType="MedicalModel.hospital" />
+          <EntitySet Name="options" EntityType="MedicalModel.option" />
+          <EntitySet Name="responses" EntityType="MedicalModel.respons" />
+          <EntitySet Name="users" EntityType="MedicalModel.user" />
+          <AssociationSet Name="FK__responses__hospi__3CF40B7E" Association="MedicalModel.FK__responses__hospi__3CF40B7E">
+            <End Role="hospital" EntitySet="hospitals" />
+            <End Role="respons" EntitySet="responses" />
+          </AssociationSet>
+          <AssociationSet Name="FK__users__hospital___336AA144" Association="MedicalModel.FK__users__hospital___336AA144">
+            <End Role="hospital" EntitySet="hospitals" />
+            <End Role="user" EntitySet="users" />
+          </AssociationSet>
+          <AssociationSet Name="FK__responses__optio__3DE82FB7" Association="MedicalModel.FK__responses__optio__3DE82FB7">
+            <End Role="option" EntitySet="options" />
+            <End Role="respons" EntitySet="responses" />
+          </AssociationSet>
+          <EntitySet Name="AspNetUsers" EntityType="MedicalModel.AspNetUser" />
+          <EntitySet Name="questions" EntityType="MedicalModel.question" />
+          <AssociationSet Name="FK__questions__user___4B422AD5" Association="MedicalModel.FK__questions__user___4B422AD5">
+            <End Role="AspNetUser" EntitySet="AspNetUsers" />
+            <End Role="question" EntitySet="questions" />
+          </AssociationSet>
+          <AssociationSet Name="FK__questions__hospi__36470DEF" Association="MedicalModel.FK__questions__hospi__36470DEF">
+            <End Role="hospital" EntitySet="hospitals" />
+            <End Role="question" EntitySet="questions" />
+          </AssociationSet>
+          <AssociationSet Name="FK__options__questio__477199F1" Association="MedicalModel.FK__options__questio__477199F1">
+            <End Role="question" EntitySet="questions" />
+            <End Role="option" EntitySet="options" />
+          </AssociationSet>
+          <AssociationSet Name="FK__responses__quest__4865BE2A" Association="MedicalModel.FK__responses__quest__4865BE2A">
+            <End Role="question" EntitySet="questions" />
+            <End Role="respons" EntitySet="responses" />
+          </AssociationSet>
           <EntitySet Name="SurveyResults" EntityType="MedicalModel.SurveyResult" />
         </EntityContainer>
+        <EntityType Name="AuditEntry">
+          <Key>
+            <PropertyRef Name="AuditEntryID" />
+          </Key>
+          <Property Name="AuditEntryID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="EntitySetName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="EntityTypeName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="State" Type="Int32" Nullable="false" />
+          <Property Name="StateName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedBy" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="AuditEntryProperties" Relationship="MedicalModel.FK_dbo_AuditEntryProperties_dbo_AuditEntries_AuditEntryID" FromRole="AuditEntry" ToRole="AuditEntryProperty" />
+        </EntityType>
+        <EntityType Name="AuditEntryProperty">
+          <Key>
+            <PropertyRef Name="AuditEntryPropertyID" />
+          </Key>
+          <Property Name="AuditEntryPropertyID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AuditEntryID" Type="Int32" Nullable="false" />
+          <Property Name="RelationName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PropertyName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="OldValue" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="NewValue" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="AuditEntry" Relationship="MedicalModel.FK_dbo_AuditEntryProperties_dbo_AuditEntries_AuditEntryID" FromRole="AuditEntryProperty" ToRole="AuditEntry" />
+        </EntityType>
+        <Association Name="FK_dbo_AuditEntryProperties_dbo_AuditEntries_AuditEntryID">
+          <End Type="MedicalModel.AuditEntry" Role="AuditEntry" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="MedicalModel.AuditEntryProperty" Role="AuditEntryProperty" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AuditEntry">
+              <PropertyRef Name="AuditEntryID" />
+            </Principal>
+            <Dependent Role="AuditEntryProperty">
+              <PropertyRef Name="AuditEntryID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="hospital">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="active" Type="Boolean" Nullable="false" />
+          <Property Name="created_on" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="responses" Relationship="MedicalModel.FK__responses__hospi__3CF40B7E" FromRole="hospital" ToRole="respons" />
+          <NavigationProperty Name="users" Relationship="MedicalModel.FK__users__hospital___336AA144" FromRole="hospital" ToRole="user" />
+          <NavigationProperty Name="questions" Relationship="MedicalModel.FK__questions__hospi__36470DEF" FromRole="hospital" ToRole="question" />
+        </EntityType>
+        <EntityType Name="option">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="question_id" Type="Int32" Nullable="false" />
+          <Property Name="text" Type="String" Nullable="false" MaxLength="60" FixedLength="false" Unicode="false" />
+          <Property Name="active" Type="Boolean" Nullable="false" />
+          <Property Name="created_on" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="deactivated_on" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="responses" Relationship="MedicalModel.FK__responses__optio__3DE82FB7" FromRole="option" ToRole="respons" />
+          <NavigationProperty Name="question" Relationship="MedicalModel.FK__options__questio__477199F1" FromRole="option" ToRole="question" />
+        </EntityType>
+        <EntityType Name="respons">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="question_id" Type="Int32" Nullable="false" />
+          <Property Name="hospital_id" Type="Int32" Nullable="false" />
+          <Property Name="option_id" Type="Int32" />
+          <Property Name="response_text" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="created" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="hospital" Relationship="MedicalModel.FK__responses__hospi__3CF40B7E" FromRole="respons" ToRole="hospital" />
+          <NavigationProperty Name="option" Relationship="MedicalModel.FK__responses__optio__3DE82FB7" FromRole="respons" ToRole="option" />
+          <NavigationProperty Name="question" Relationship="MedicalModel.FK__responses__quest__4865BE2A" FromRole="respons" ToRole="question" />
+        </EntityType>
+        <EntityType Name="user">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="username" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="false" />
+          <Property Name="email" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="false" />
+          <Property Name="name" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="password_hash" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
+          <Property Name="active" Type="Boolean" Nullable="false" />
+          <Property Name="created_on" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="hospital_id" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="hospital" Relationship="MedicalModel.FK__users__hospital___336AA144" FromRole="user" ToRole="hospital" />
+        </EntityType>
+        <Association Name="FK__responses__hospi__3CF40B7E">
+          <End Type="MedicalModel.hospital" Role="hospital" Multiplicity="1" />
+          <End Type="MedicalModel.respons" Role="respons" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="hospital">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="respons">
+              <PropertyRef Name="hospital_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__users__hospital___336AA144">
+          <End Type="MedicalModel.hospital" Role="hospital" Multiplicity="1" />
+          <End Type="MedicalModel.user" Role="user" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="hospital">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="user">
+              <PropertyRef Name="hospital_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__responses__optio__3DE82FB7">
+          <End Type="MedicalModel.option" Role="option" Multiplicity="0..1" />
+          <End Type="MedicalModel.respons" Role="respons" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="option">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="respons">
+              <PropertyRef Name="option_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="AspNetUser">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="Email" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="EmailConfirmed" Type="Boolean" Nullable="false" />
+          <Property Name="PasswordHash" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="SecurityStamp" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="PhoneNumber" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="PhoneNumberConfirmed" Type="Boolean" Nullable="false" />
+          <Property Name="TwoFactorEnabled" Type="Boolean" Nullable="false" />
+          <Property Name="LockoutEndDateUtc" Type="DateTime" Precision="3" />
+          <Property Name="LockoutEnabled" Type="Boolean" Nullable="false" />
+          <Property Name="AccessFailedCount" Type="Int32" Nullable="false" />
+          <Property Name="UserName" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="questions" Relationship="MedicalModel.FK__questions__user___4B422AD5" FromRole="AspNetUser" ToRole="question" />
+        </EntityType>
+        <EntityType Name="question">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="hospital_id" Type="Int32" Nullable="false" />
+          <Property Name="user_id" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="text" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="active" Type="Boolean" Nullable="false" />
+          <Property Name="free_text_field" Type="Boolean" Nullable="false" />
+          <Property Name="multiple_choice" Type="Boolean" Nullable="false" />
+          <Property Name="created_on" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="AspNetUser" Relationship="MedicalModel.FK__questions__user___4B422AD5" FromRole="question" ToRole="AspNetUser" />
+          <NavigationProperty Name="hospital" Relationship="MedicalModel.FK__questions__hospi__36470DEF" FromRole="question" ToRole="hospital" />
+          <NavigationProperty Name="options" Relationship="MedicalModel.FK__options__questio__477199F1" FromRole="question" ToRole="option" />
+          <NavigationProperty Name="responses" Relationship="MedicalModel.FK__responses__quest__4865BE2A" FromRole="question" ToRole="respons" />
+        </EntityType>
+        <Association Name="FK__questions__user___4B422AD5">
+          <End Type="MedicalModel.AspNetUser" Role="AspNetUser" Multiplicity="1" />
+          <End Type="MedicalModel.question" Role="question" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUser">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="question">
+              <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__questions__hospi__36470DEF">
+          <End Type="MedicalModel.hospital" Role="hospital" Multiplicity="1" />
+          <End Type="MedicalModel.question" Role="question" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="hospital">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="question">
+              <PropertyRef Name="hospital_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__options__questio__477199F1">
+          <End Type="MedicalModel.question" Role="question" Multiplicity="1" />
+          <End Type="MedicalModel.option" Role="option" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="question">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="option">
+              <PropertyRef Name="question_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__responses__quest__4865BE2A">
+          <End Type="MedicalModel.question" Role="question" Multiplicity="1" />
+          <End Type="MedicalModel.respons" Role="respons" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="question">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="respons">
+              <PropertyRef Name="question_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityType Name="SurveyResult">
           <Key>
             <PropertyRef Name="ID" />
@@ -47,12 +535,118 @@
           <Property Name="Comments" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="CREATE_DATE" Type="DateTime" Nullable="false" Precision="3" />
         </EntityType>
+
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="MedicalModelStoreContainer" CdmEntityContainer="MedicalEntities" >
+          <EntitySetMapping Name="AuditEntries">
+            <EntityTypeMapping TypeName="MedicalModel.AuditEntry">
+              <MappingFragment StoreEntitySet="AuditEntries">
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="StateName" ColumnName="StateName" />
+                <ScalarProperty Name="State" ColumnName="State" />
+                <ScalarProperty Name="EntityTypeName" ColumnName="EntityTypeName" />
+                <ScalarProperty Name="EntitySetName" ColumnName="EntitySetName" />
+                <ScalarProperty Name="AuditEntryID" ColumnName="AuditEntryID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="AuditEntryProperties">
+            <EntityTypeMapping TypeName="MedicalModel.AuditEntryProperty">
+              <MappingFragment StoreEntitySet="AuditEntryProperties">
+                <ScalarProperty Name="NewValue" ColumnName="NewValue" />
+                <ScalarProperty Name="OldValue" ColumnName="OldValue" />
+                <ScalarProperty Name="PropertyName" ColumnName="PropertyName" />
+                <ScalarProperty Name="RelationName" ColumnName="RelationName" />
+                <ScalarProperty Name="AuditEntryID" ColumnName="AuditEntryID" />
+                <ScalarProperty Name="AuditEntryPropertyID" ColumnName="AuditEntryPropertyID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="hospitals">
+            <EntityTypeMapping TypeName="MedicalModel.hospital">
+              <MappingFragment StoreEntitySet="hospitals">
+                <ScalarProperty Name="created_on" ColumnName="created_on" />
+                <ScalarProperty Name="active" ColumnName="active" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="options">
+            <EntityTypeMapping TypeName="MedicalModel.option">
+              <MappingFragment StoreEntitySet="options">
+                <ScalarProperty Name="deactivated_on" ColumnName="deactivated_on" />
+                <ScalarProperty Name="created_on" ColumnName="created_on" />
+                <ScalarProperty Name="active" ColumnName="active" />
+                <ScalarProperty Name="text" ColumnName="text" />
+                <ScalarProperty Name="question_id" ColumnName="question_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="responses">
+            <EntityTypeMapping TypeName="MedicalModel.respons">
+              <MappingFragment StoreEntitySet="responses">
+                <ScalarProperty Name="created" ColumnName="created" />
+                <ScalarProperty Name="response_text" ColumnName="response_text" />
+                <ScalarProperty Name="option_id" ColumnName="option_id" />
+                <ScalarProperty Name="hospital_id" ColumnName="hospital_id" />
+                <ScalarProperty Name="question_id" ColumnName="question_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="users">
+            <EntityTypeMapping TypeName="MedicalModel.user">
+              <MappingFragment StoreEntitySet="users">
+                <ScalarProperty Name="hospital_id" ColumnName="hospital_id" />
+                <ScalarProperty Name="created_on" ColumnName="created_on" />
+                <ScalarProperty Name="active" ColumnName="active" />
+                <ScalarProperty Name="password_hash" ColumnName="password_hash" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="email" ColumnName="email" />
+                <ScalarProperty Name="username" ColumnName="username" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="AspNetUsers">
+            <EntityTypeMapping TypeName="MedicalModel.AspNetUser">
+              <MappingFragment StoreEntitySet="AspNetUsers">
+                <ScalarProperty Name="UserName" ColumnName="UserName" />
+                <ScalarProperty Name="AccessFailedCount" ColumnName="AccessFailedCount" />
+                <ScalarProperty Name="LockoutEnabled" ColumnName="LockoutEnabled" />
+                <ScalarProperty Name="LockoutEndDateUtc" ColumnName="LockoutEndDateUtc" />
+                <ScalarProperty Name="TwoFactorEnabled" ColumnName="TwoFactorEnabled" />
+                <ScalarProperty Name="PhoneNumberConfirmed" ColumnName="PhoneNumberConfirmed" />
+                <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
+                <ScalarProperty Name="SecurityStamp" ColumnName="SecurityStamp" />
+                <ScalarProperty Name="PasswordHash" ColumnName="PasswordHash" />
+                <ScalarProperty Name="EmailConfirmed" ColumnName="EmailConfirmed" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="questions">
+            <EntityTypeMapping TypeName="MedicalModel.question">
+              <MappingFragment StoreEntitySet="questions">
+                <ScalarProperty Name="created_on" ColumnName="created_on" />
+                <ScalarProperty Name="multiple_choice" ColumnName="multiple_choice" />
+                <ScalarProperty Name="free_text_field" ColumnName="free_text_field" />
+                <ScalarProperty Name="active" ColumnName="active" />
+                <ScalarProperty Name="text" ColumnName="text" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="hospital_id" ColumnName="hospital_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="SurveyResults">
             <EntityTypeMapping TypeName="MedicalModel.SurveyResult">
               <MappingFragment StoreEntitySet="SurveyResults">
